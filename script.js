@@ -105,31 +105,49 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. BİLDİRİ YAYINLAMA İŞLEMLERİ
     let formData = {};
 
+    // Basit XSS koruması için metinleri escape eden fonksiyon
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, function(tag) {
+            const chars = {
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            };
+            return chars[tag] || tag;
+        });
+    }
+
+    // Form doğrulama fonksiyonu
+    function validateForm() {
+        return capturedImageData && userLocation && descriptionEl.value.trim().length > 0;
+    }
+
+    // Form alanı değiştikçe butonu kontrol et
+    [descriptionEl, animalTypeEl, noticeTypeEl].forEach(el => {
+        el.addEventListener('input', () => {
+            publishBtn.disabled = !validateForm();
+        });
+    });
+
     publishBtn.addEventListener('click', () => {
-        if (!capturedImageData || !userLocation) {
-            alert("Lütfen önce fotoğraf çekin ve konumun belirlendiğinden emin olun.");
+        if (!validateForm()) {
+            alert("Lütfen tüm alanları doldurun ve fotoğraf çekin.");
             return;
         }
-
         // Form verilerini topla
         formData = {
             photo: capturedImageData,
             location: userLocation,
             animal: animalTypeEl.value,
             type: noticeTypeEl.value,
-            description: descriptionEl.value.trim(),
+            description: escapeHTML(descriptionEl.value.trim()),
             time: new Date()
         };
-
         // Modal içeriğini doldur
         modalBody.innerHTML = `
             <img src="${formData.photo}" alt="Onay Fotoğrafı">
-            <p><strong>Durum:</strong> ${formData.type} (${formData.animal})</p>
+            <p><strong>Durum:</strong> ${escapeHTML(formData.type)} (${escapeHTML(formData.animal)})</p>
             <p><strong>Konum:</strong> ${formData.location.latitude.toFixed(4)}, ${formData.location.longitude.toFixed(4)}</p>
             <p><strong>Açıklama:</strong> ${formData.description || 'Yok'}</p>
         `;
-
-        // Modalı göster
         modal.style.display = 'flex';
     });
 
@@ -138,46 +156,57 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     confirmPublishBtn.addEventListener('click', () => {
-        // Placeholder'ı kaldır
         if (placeholder) {
             placeholder.remove();
         }
-
         // Yeni bildiri kartı oluştur
         const feedItem = document.createElement('div');
         feedItem.className = 'feed-item';
-        
         const timeString = formData.time.toLocaleDateString('tr-TR', {
             year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
-
         feedItem.innerHTML = `
-            <img src="${formData.photo}" alt="${formData.animal} ${formData.type}">
-            <h4>${formData.type} - ${formData.animal}</h4>
+            <img src="${formData.photo}" alt="${escapeHTML(formData.animal)} ${escapeHTML(formData.type)}">
+            <h4>${escapeHTML(formData.type)} - ${escapeHTML(formData.animal)}</h4>
             <p><strong>Görülme Zamanı:</strong> ${timeString}</p>
             <p><strong>Konum:</strong> ${formData.location.latitude.toFixed(4)}, ${formData.location.longitude.toFixed(4)}</p>
             <p>${formData.description || ''}</p>
         `;
-
-        // Listeye en başa ekle
         feedList.prepend(feedItem);
-
-        // Formu ve durumu sıfırla
+        // Bildiriyi localStorage'a kaydet
+        saveNoticeToStorage(formData);
         resetForm();
         modal.style.display = 'none';
     });
 
-    function resetForm() {
-        descriptionEl.value = '';
-        cameraStream.style.display = 'block';
-        photoPreview.style.display = 'none';
-        photoPreview.src = '';
-        capturedImageData = null;
-        publishBtn.disabled = true;
-        captureBtn.textContent = "Fotoğraf Çek";
+    // localStorage'a kaydetme ve yükleme
+    function saveNoticeToStorage(notice) {
+        let notices = JSON.parse(localStorage.getItem('notices') || '[]');
+        notices.unshift(notice);
+        localStorage.setItem('notices', JSON.stringify(notices));
+    }
+    function loadNoticesFromStorage() {
+        let notices = JSON.parse(localStorage.getItem('notices') || '[]');
+        if (notices.length > 0 && placeholder) placeholder.remove();
+        notices.forEach(n => {
+            const feedItem = document.createElement('div');
+            feedItem.className = 'feed-item';
+            const timeString = new Date(n.time).toLocaleDateString('tr-TR', {
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            feedItem.innerHTML = `
+                <img src="${n.photo}" alt="${escapeHTML(n.animal)} ${escapeHTML(n.type)}">
+                <h4>${escapeHTML(n.type)} - ${escapeHTML(n.animal)}</h4>
+                <p><strong>Görülme Zamanı:</strong> ${timeString}</p>
+                <p><strong>Konum:</strong> ${n.location.latitude.toFixed(4)}, ${n.location.longitude.toFixed(4)}</p>
+                <p>${n.description || ''}</p>
+            `;
+            feedList.appendChild(feedItem);
+        });
     }
 
     // Uygulamayı Başlat
     getLocation();
     startCamera();
+    loadNoticesFromStorage();
 });

@@ -233,3 +233,34 @@ button:disabled {
 #cancel-publish-btn:hover {
     background-color: #bbb;
 }
+
+/* Responsive Tasarım */
+@media (max-width: 900px) {
+    .app-container {
+        flex-direction: column;
+        height: auto;
+    }
+    #map-container, #main-container, #feed-container {
+        flex: unset;
+        width: 100%;
+        min-height: 300px;
+        border: none;
+    }
+    #main-container, #feed-container {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .modal-content {
+        padding: 10px;
+        max-width: 98vw;
+    }
+    .form-wrapper, .camera-wrapper {
+        max-width: 100%;
+    }
+    button {
+        font-size: 0.95em;
+        padding: 10px 12px;
+    }
+}
