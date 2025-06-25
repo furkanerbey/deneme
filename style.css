@@ -1,0 +1,235 @@
+:root {
+    --primary-color: #4a90e2;
+    --dark-color: #333;
+    --light-color: #f4f4f4;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #e9ebee;
+    color: var(--dark-color);
+    line-height: 1.6;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Bölüm 1: Harita */
+#map-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f0f0f0;
+    border-right: 1px solid #ccc;
+}
+
+#map {
+    flex-grow: 1;
+    width: 100%;
+    background-color: #dcdcdc;
+}
+
+.location-info {
+    padding: 15px;
+    background: white;
+    font-size: 0.9em;
+    border-top: 1px solid #ccc;
+}
+
+/* Bölüm 2: Ana İçerik */
+#main-container {
+    flex: 1.2;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    overflow-y: auto;
+}
+
+.camera-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    border: 2px dashed #ccc;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+#camera-stream, #photo-preview {
+    width: 100%;
+    display: block;
+    height: auto;
+}
+
+#photo-preview {
+    display: none; /* Başlangıçta gizli */
+}
+
+#capture-btn {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.form-wrapper {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto 0 auto;
+}
+
+h3 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: var(--border-radius);
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Bölüm 3: Bildiri Akışı */
+#feed-container {
+    flex: 1;
+    background: var(--light-color);
+    padding: 20px;
+    overflow-y: auto;
+    border-left: 1px solid #ccc;
+}
+
+#feed-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.feed-item {
+    background: #fff;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 15px;
+}
+
+.feed-item img {
+    width: 100%;
+    border-radius: var(--border-radius);
+    margin-bottom: 10px;
+}
+
+.feed-item h4 {
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+.feed-item p {
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.feed-item-placeholder {
+    text-align: center;
+    color: #888;
+    padding: 40px;
+}
+
+
+/* Genel Buton Stilleri */
+button {
+    display: inline-block;
+    padding: 12px 24px;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #3a7bc8;
+}
+
+button:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+}
+
+/* Modal Stilleri */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+}
+
+#modal-body img {
+    max-width: 100%;
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+}
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-actions button {
+    width: auto;
+}
+
+#cancel-publish-btn {
+    background-color: #ccc;
+    color: var(--dark-color);
+}
+
+#cancel-publish-btn:hover {
+    background-color: #bbb;
+}
